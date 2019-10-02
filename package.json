@@ -1,0 +1,20 @@
+{
+  "name": "to_do_srv_ver_1.00",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "better-sqlite3": "^5.4.3",
+    "bluebird": "^3.7.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "sqlite3": "^4.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
