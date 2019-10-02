@@ -16,8 +16,7 @@ var dbController = (function() {
 
     return {
 
-       
-
+      
         initDB: function() {
             let db = new sqlite3.Database("./mydb.sqlite3", (err) => { 
                 if (err) { 
@@ -127,9 +126,8 @@ var serverController = (function() {
       
       app.get("/createTable", function(req, res) {
       
-        db = dbController.createTable();  
-      
-        res.send("createTable Succses");
+        var db = dbController.initDB();
+        dbController.initNoteTable();
       
       });
       
@@ -180,7 +178,7 @@ var serverController = (function() {
        
         function rowObj(id, NoteMessage) {
           this.id = id;
-          this.NoteMessage = NoteMessage;
+          this.msg = NoteMessage;
         }
 
         app.get("/getDb", function(req, res) {
@@ -189,12 +187,18 @@ var serverController = (function() {
 
           db.all("SELECT rowid AS id, NoteMessage FROM TODONOTES", function(err, rows) {
             arr = [];
+            arr2 = [];
+            var x = " ";
             rows.forEach(function (row) {
+
               var newRow = new rowObj(row.id, row.NoteMessage);
               arr.push(newRow);
+              // arr2.push(row.NoteMessage)
             });
+            
+            //  res.json(JSON.stringify(arr));
+             res.json(arr);
 
-            res.send(JSON.stringify(arr));
         });
 
 
