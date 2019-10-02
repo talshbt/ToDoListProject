@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.DataOutputStream;
@@ -6,10 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 //import com.fasterxml.jackson.databind.ObjectMapper.disable(DeserializationFeature feature);
 public class ToDoUIController {
@@ -142,6 +143,7 @@ public class ToDoUIController {
 		String req = "addNote";
 		String serverUrl = "http://localhost:5555/";
 		ToDoUIController hce = new ToDoUIController();
+                
 		
 
 //		hce.addNote(serverUrl,  req, note1);
