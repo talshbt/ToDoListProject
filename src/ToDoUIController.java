@@ -8,12 +8,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
 //import com.fasterxml.jackson.databind.ObjectMapper.disable(DeserializationFeature feature);
 public class ToDoUIController {
-
+    String serverUrl ="http://localhost:5555/";
+    
     private String read(InputStream is) throws IOException {
         BufferedReader in = null;
         String inputLine;
@@ -74,7 +77,7 @@ public class ToDoUIController {
     }
     
     
-    void addNote(String serverUrl, String req, String note) {
+    void addNote(String req, String note) {
     	String url = serverUrl+req;
 		try {
             String body = post(url, note);
@@ -85,7 +88,9 @@ public class ToDoUIController {
         }
     }
     
-	public Object getResponse(String serverUrl, String request) throws IOException {
+   
+    
+	public Object getResponse(String request) throws IOException {
 		
 		URL url = new URL(serverUrl + request);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -101,6 +106,30 @@ public class ToDoUIController {
 		
 		return content;
 	}
+        
+        
+         String[] refresh(){
+          Object json = null;
+          try {
+             json = getResponse("getDb");
+            
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            }
+          
+            Note[] arr  = convertJsonToArr(json);
+            String[] res = new String[arr.length];
+            
+            for(int i = 0; i < arr.length; ++i){
+                res[i] = arr[i].getMsg();
+                System.out.println(res[i]);
+
+            }
+           
+
+            return res;
+    
+        }
 	
 	public Note[] convertJsonToArr(Object json) {
 		
@@ -140,7 +169,8 @@ public class ToDoUIController {
 		String note5 = "NoteMessage=task5";
 
 		String req = "addNote";
-		String serverUrl = "http://localhost:5555/";
+                
+//		String serverUrl = "http://localhost:5555/";
 		ToDoUIController hce = new ToDoUIController();
                 
 		
@@ -153,17 +183,22 @@ public class ToDoUIController {
 //		hce.addNote(serverUrl, req,  note2);
 //		
 
-		Object json = hce.getResponse(serverUrl, "getDb");
-		Note[] arr  = hce.convertJsonToArr(json);
+//		Object json = hce.getResponse("getDb");
+//		Note[] arr  = hce.convertJsonToArr(json);
+//                List<String> targetList = new ArrayList();
+//                
+//
+//
+//		for (Note person : arr) {
+//                      targetList.add(person.getMsg());
+//                      System.out.println(person.toString());
+//		}
 
 
-		for (Note person : arr) {
-		
-			System.out.println(person.toString());
-		}
+                hce.refresh();
 		
 		
-		hce.addNote(serverUrl,  req, note1);
+		hce.addNote(req, note1);
 
 
 	}

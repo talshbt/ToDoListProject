@@ -32,6 +32,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.TitledBorder;
 
 
@@ -41,7 +44,7 @@ import javax.swing.border.TitledBorder;
 class Constants {
 
 	public static final String NIMBUS_LF = "Nimbus";
-
+      
 	public static final String[] LIST_DATA = { "Ashraf Sarhan", "Sara Mohamed",
 			"Esraa Ahmed", "Ghada Mohamed", "Dalia Osama", "Amira Mohamed",
 			"Sama Karim", "Nada Ahmed", "Ahmed Farrag", "Mohamed Senussi",
@@ -79,6 +82,7 @@ class SwingJList<T> extends JList<T> {
 }
  
 public class ToDoUI extends JFrame {
+    ToDoUIController hce = new ToDoUIController();
    JFrame mainFrame;
     JPanel headerPanel,headerPanel2, footerPanel, middlePanel;
     JPanel p1,p2,p3;
@@ -86,7 +90,7 @@ public class ToDoUI extends JFrame {
     JButton addButton, deleteButton, editButton; 
     SwingJList<String> swingJList;
     JScrollPane buttomPanel;
-    
+    ToDoUIController uiController;
     
     public void createTopPanel(JPanel topPannel){
         JTextField nameField = new JTextField(14);
@@ -130,6 +134,7 @@ public class ToDoUI extends JFrame {
 
     
    ToDoUI(){
+        uiController = new ToDoUIController();
        
         mainFrame = new JFrame();
         
@@ -149,10 +154,10 @@ public class ToDoUI extends JFrame {
         p1.setBackground(new Color(0, 100, 255, 15));
         p2.setBackground(new Color(0, 100, 255, 15));
 
-        swingJList = new SwingJList<>(Arrays.asList());
+        swingJList = new SwingJList<>(Arrays.asList(uiController.refresh()));
 //        swingJList.setBackground(new Color(255, 255, 204));
 
-         swingJList.setBackground(Color.WHITE);
+        swingJList.setBackground(Color.WHITE);
         swingJList.setCellRenderer(getRenderer());
 
         buttomPanel = new JScrollPane(swingJList);
@@ -272,11 +277,36 @@ public class ToDoUI extends JFrame {
    
 
    public static void main(String args[]) {
-      ToDoUI  todo = new ToDoUI();      
+       
+      
+      SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					setLookAndFeel(Constants.NIMBUS_LF);
+					ToDoUI  todo = new ToDoUI(); 
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
    }
      
         
-    
+    public static void setLookAndFeel(String lf) throws Exception {
+		// Set Nimbus as L&F
+		try {
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if (lf.equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// If Nimbus is not available, you can set the GUI the system
+			// default L&F.
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+	}
 
    
     @SuppressWarnings("unchecked")
