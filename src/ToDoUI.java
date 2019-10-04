@@ -36,6 +36,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 
 
@@ -106,8 +108,8 @@ public class ToDoUI extends JFrame {
                                 
                        
                         if (name != null && !"".equals(name)) {
-                            String note1 = "NoteMessage=" +name ;
-                            uiController.addNote("addNote", note1);
+                            String note1 = name;
+                            uiController.addNewNote(note1);
                             refreshList();
                         } else {
                                 JOptionPane.showMessageDialog(null,
@@ -116,6 +118,51 @@ public class ToDoUI extends JFrame {
                         }
                 }
         });
+        
+//        deleteButton.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				DefaultListModel model = (DefaultListModel) swingJList.getModel();
+//				int selectedIndex = swingJList.getModel().getSize() - swingJList.getSelectedIndex() -1;
+//				if (selectedIndex != -1) {
+//                    uiController.deleteItem(selectedIndex);
+//                    refreshList();
+//
+//				}
+				
+				
+				
+				
+//				    int[] selectedIx = swingJList.getSelectedIndices();
+//				    Integer firstSelIx = swingJList.getModel().getSize()- swingJList.getSelectedIndex() -1 ;
+//				    System.out.println("index id = " + firstSelIx);
+//                    uiController.deleteItem(firstSelIx);
+//                    createGui();
+
+					
+				
+//			}
+//		});
+//        
+        deleteButton.addActionListener(new ActionListener() {  
+            
+            public void actionPerformed(ActionEvent e) {   
+                String data = "";  
+                if (swingJList.getSelectedIndex() != -1) {                       
+                    data = "OS Type Selected: " + swingJList.getSelectedValue();
+                    Integer ind = swingJList.getSelectedIndex();
+                    nameField.setText(ind.toString());  
+                }  
+//                if(swingJList.getSelectedIndex() != -1){  
+//                    data += ", Oprating System Selected: ";  
+//                    for(Object f :swingJList.getSelectedValues()){  
+//                       data += f + " ";  
+//                    }  
+//                }  
+//                label.setText(data);  
+            }
+            
+        });     
+    
 
         topPannel.add(nameField);
         topPannel.add(addButton);
@@ -172,7 +219,7 @@ public class ToDoUI extends JFrame {
     
     
     void createGui(){
-        Constants.getList(uiController.getList());
+        Constants.getList(uiController.getMsgList());
         gridLayout = new GridLayout(0,1);
        
         footerPanel = addPanel("South", Color.BLUE, "footer");
@@ -189,7 +236,6 @@ public class ToDoUI extends JFrame {
     
    ToDoUI(){
        mainFrame = new JFrame();
-
        uiController = new ToDoUIController();
        createGui();
        initFrame();

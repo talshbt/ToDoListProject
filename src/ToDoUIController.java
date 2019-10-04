@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -76,18 +77,6 @@ public class ToDoUIController {
         }
     }
     
-    
-    void addNote(String req, String note) {
-    	String url = serverUrl+req;
-		try {
-            String body = post(url, note);
-            
-            System.out.println(body);
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
-        }
-    }
-    
    
     
 	public Object getResponse(String request) throws IOException {
@@ -108,7 +97,7 @@ public class ToDoUIController {
 	}
         
         
-        String[] getList(){
+        String[] getMsgList(){
           Object json = null;
           try {
              json = getResponse("getDb");
@@ -131,10 +120,52 @@ public class ToDoUIController {
     
         }
         
-        void deleteItem(String req, String id){
-        	String url = serverUrl+req;
+        Note[] getNoteList(){
+            Object json = null;
+            try {
+               json = getResponse("getDb");
+              
+              } catch(IOException ioe) {
+                  ioe.printStackTrace();
+              }
+            
+              Note[] arr  = convertJsonToArr(json);
+              
+              for(int i = 0; i < arr.length; ++i){
+                
+                  System.out.println(arr[i].toString());
+
+              }
+             
+
+              return arr;
+      
+          }
+        
+        void deleteItem(Integer id){
+        	
+    		Note[] noteList = getNoteList();
+    		id = noteList[id].getId();
+    		System.out.println("real index is = " + id);
+        	String url = serverUrl+"deleteNote";
+    		String ID = "id=" +id.toString();
+
     		try {
-                String body = post(url, id);
+                String body = post(url, ID);
+                
+                System.out.println(body);
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+        
+        
+        void addNewNote(String note){
+        	String url = serverUrl+"addNote";
+    		String newNote = "NoteMessage=" +note;
+
+    		try {
+                String body = post(url, newNote);
                 
                 System.out.println(body);
             } catch(IOException ioe) {
@@ -173,19 +204,31 @@ public class ToDoUIController {
   
     
 	public static void main(String[] args) throws IOException {
-		String note1 = "NoteMessage=task1";
-	
 
-		String req = "addNote";
                 
 		ToDoUIController hce = new ToDoUIController();
+		Note[] noteList = hce.getNoteList();
+		String[] msgList = hce.getMsgList();
 		
-		hce.deleteItem(req, "1");
+        List<Note> noteArrayList= new ArrayList<Note>(Arrays.asList(noteList));
+        
+        Integer id = noteList[1].getId();
+        System.out.println(id);
+//		for(Note note : noteList) {
+//			if(note.getId() == 7) {
+//				System.out.println(note.getMsg());
+//				break;
+//			}
+//		}
+		
+
+//		
+		hce.deleteItem(0);
                 
-        hce.getList();
+//        hce.getList();
 		
 		
-//		hce.addNote(req, note1);
+		hce.addNewNote("new note");
 
 
 	}

@@ -146,7 +146,8 @@ var serverController = (function() {
       
       app.post("/deleteNote", function(req, res) {
         
-        let test = req.body.id;
+        let test = parseInt(req.body.id);
+        
         dbController.deleteNote(test);
         console.log("---------------remove now " + test);
         dbController.read();
