@@ -108,7 +108,7 @@ public class ToDoUIController {
 	}
         
         
-         String[] refresh(){
+        String[] getList(){
           Object json = null;
           try {
              json = getResponse("getDb");
@@ -129,6 +129,17 @@ public class ToDoUIController {
 
             return res;
     
+        }
+        
+        void deleteItem(String req, String id){
+        	String url = serverUrl+req;
+    		try {
+                String body = post(url, id);
+                
+                System.out.println(body);
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            }
         }
 	
 	public Note[] convertJsonToArr(Object json) {
@@ -163,42 +174,18 @@ public class ToDoUIController {
     
 	public static void main(String[] args) throws IOException {
 		String note1 = "NoteMessage=task1";
-		String note2 = "NoteMessage=task2";
-		String note3 = "NoteMessage=task3";
-		String note4 = "NoteMessage=task4";
-		String note5 = "NoteMessage=task5";
+	
 
 		String req = "addNote";
                 
-//		String serverUrl = "http://localhost:5555/";
 		ToDoUIController hce = new ToDoUIController();
+		
+		hce.deleteItem(req, "1");
                 
-		
-
-//		hce.addNote(serverUrl,  req, note1);
-//		hce.addNote(serverUrl,  req, note2);
-//		hce.addNote(serverUrl,  req, note3);
-//		hce.addNote(serverUrl,  req, note4);
-//		hce.addNote(serverUrl, req,  note1);
-//		hce.addNote(serverUrl, req,  note2);
-//		
-
-//		Object json = hce.getResponse("getDb");
-//		Note[] arr  = hce.convertJsonToArr(json);
-//                List<String> targetList = new ArrayList();
-//                
-//
-//
-//		for (Note person : arr) {
-//                      targetList.add(person.getMsg());
-//                      System.out.println(person.toString());
-//		}
-
-
-                hce.refresh();
+        hce.getList();
 		
 		
-		hce.addNote(req, note1);
+//		hce.addNote(req, note1);
 
 
 	}

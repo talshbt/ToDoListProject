@@ -42,13 +42,14 @@ import javax.swing.border.TitledBorder;
 
 
 class Constants {
+    
+        public static void getList(String[] list){
+            LIST_DATA = list;
+        }
 
 	public static final String NIMBUS_LF = "Nimbus";
       
-	public static final String[] LIST_DATA = { "Ashraf Sarhan", "Sara Mohamed",
-			"Esraa Ahmed", "Ghada Mohamed", "Dalia Osama", "Amira Mohamed",
-			"Sama Karim", "Nada Ahmed", "Ahmed Farrag", "Mohamed Senussi",
-			"Nehal Taha", "Ahmed Sarhan", "Khaled Mohamed" };
+	public static String[] LIST_DATA = null;
 
 	public static final int NEW_ELEMENT_IDX = 0;
 
@@ -60,12 +61,12 @@ class SwingJList<T> extends JList<T> {
 
 	public SwingJList(List<T> listData) {
 
-		// Create a JList data model
 		super(new DefaultListModel<T>());
+		for(T element: listData) {
+			addElement(element);
+		}
 
-		listData.forEach(element -> addElement(element));
 
-		// Set selection mode
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 	}
@@ -83,7 +84,7 @@ class SwingJList<T> extends JList<T> {
  
 public class ToDoUI extends JFrame {
     ToDoUIController hce = new ToDoUIController();
-   JFrame mainFrame;
+    JFrame mainFrame;
     JPanel headerPanel,headerPanel2, footerPanel, middlePanel;
     JPanel p1,p2,p3;
     GridLayout gridLayout;
@@ -93,7 +94,7 @@ public class ToDoUI extends JFrame {
     ToDoUIController uiController;
     
     public void createTopPanel(JPanel topPannel){
-        JTextField nameField = new JTextField(14);
+        final JTextField nameField = new JTextField(14);
 
         addButton = new JButton("Add");
         deleteButton = new JButton("Delete");
@@ -102,9 +103,12 @@ public class ToDoUI extends JFrame {
         addButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                         String name = nameField.getText();
-                        
+                                
+                       
                         if (name != null && !"".equals(name)) {
-                                swingJList.addElement(name);
+                            String note1 = "NoteMessage=" +name ;
+                            uiController.addNote("addNote", note1);
+                            refreshList();
                         } else {
                                 JOptionPane.showMessageDialog(null,
                                                 "Employee name is empty", "Error",
@@ -131,47 +135,71 @@ public class ToDoUI extends JFrame {
             }
         };
     }
-
     
-   ToDoUI(){
-        uiController = new ToDoUIController();
-       
-        mainFrame = new JFrame();
-        
-        gridLayout = new GridLayout(0,1);
-        
+    
+    
+    void createHeaderPanel(){
         headerPanel = addPanel("North", Color.blue);
         headerPanel.setBackground( new Color(0, 100, 255, 90) );
-        footerPanel = addPanel("South", Color.BLUE, "footer");
-        middlePanel = addPanel("Center", gridLayout);
-        
+        createTopPanel(headerPanel);
+
+    }
+    
+    void createToDoListPanel(){
         p1= addPanel(middlePanel, Color.GRAY, "");
-        p2= addPanel(middlePanel, Color.GRAY, "");
-       
         addTitleToPanel(p1, "To Do");
-        addTitleToPanel(p2, "Complete");
-
         p1.setBackground(new Color(0, 100, 255, 15));
-        p2.setBackground(new Color(0, 100, 255, 15));
-
-        swingJList = new SwingJList<>(Arrays.asList(uiController.refresh()));
-//        swingJList.setBackground(new Color(255, 255, 204));
-
+        swingJList = new SwingJList<String>(Arrays.asList(Constants.LIST_DATA));
         swingJList.setBackground(Color.WHITE);
         swingJList.setCellRenderer(getRenderer());
-
         buttomPanel = new JScrollPane(swingJList);
         buttomPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
         buttomPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
         buttomPanel.setPreferredSize(new Dimension(400, 300));
-           
-        
-        
+
         p1.add(buttomPanel);
  
-        createTopPanel(headerPanel);
+    }
+    
+    void createCompleteListPanel(){
+        p2= addPanel(middlePanel, Color.GRAY, "");
+       
+        addTitleToPanel(p2, "Complete");
+
+        p2.setBackground(new Color(0, 100, 255, 15));
+    }
+    
+    
+    
+    void createGui(){
+        Constants.getList(uiController.getList());
+        gridLayout = new GridLayout(0,1);
+       
+        footerPanel = addPanel("South", Color.BLUE, "footer");
+        middlePanel = addPanel("Center", gridLayout);
+        
+        createHeaderPanel();
+        createToDoListPanel();
+        createCompleteListPanel();
+
+ 
          
-        initFrame();
+    }
+
+    
+   ToDoUI(){
+       mainFrame = new JFrame();
+
+       uiController = new ToDoUIController();
+       createGui();
+       initFrame();
+
+   }
+   
+   void refreshList(){
+       
+       createGui();
+
    }
    
      private JPanel getPanel(Color c, String txt)
@@ -228,7 +256,7 @@ public class ToDoUI extends JFrame {
     }
     
      public java.util.List<JPanel> addPanelsToPanel(JPanel mainPanel,  Color color, String txt, int numberOfComponent){
-        java.util.List<JPanel> list = new ArrayList<>();
+        java.util.List<JPanel> list = new ArrayList<JPanel>();
         for(Integer i = 0; i < numberOfComponent; ++i){
           
           JPanel panel = getPanel(color, txt + i.toString());
@@ -241,7 +269,7 @@ public class ToDoUI extends JFrame {
     }
      
      public java.util.List<JButton> addButtonsToPanel(JPanel mainPanel, String txt, int numberOfComponent){
-        java.util.List<JButton> list = new ArrayList<>();
+        java.util.List<JButton> list = new ArrayList<JButton>();
         for(Integer i = 0; i < numberOfComponent; ++i){
           
           JButton bt = new JButton(txt + i.toString()); 
@@ -294,18 +322,18 @@ public class ToDoUI extends JFrame {
         
     public static void setLookAndFeel(String lf) throws Exception {
 		// Set Nimbus as L&F
-		try {
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if (lf.equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			// If Nimbus is not available, you can set the GUI the system
-			// default L&F.
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
+//		try {
+//			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//				if (lf.equals(info.getName())) {
+//					UIManager.setLookAndFeel(info.getClassName());
+//					break;
+//				}
+//			}
+//		} catch (Exception e) {
+//			// If Nimbus is not available, you can set the GUI the system
+//			// default L&F.
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		}
 	}
 
    
