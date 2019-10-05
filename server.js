@@ -110,6 +110,12 @@ var dbController = (function() {
             getAll: function (){
               return db.all(`SELECT * FROM TODONOTES`)
             },
+            getAllWaitedNotes: function (){
+              return db.all(`SELECT * FROM TODONOTES WHERE isDone=0`)
+            },
+            getAllDoneNotes: function (){
+              return db.all(`SELECT * FROM TODONOTES WHERE isDone=1`)
+            },
             test: function(){
               getData();
             }
@@ -238,7 +244,6 @@ var serverController = (function() {
 
         app.get("/getDb", function(req, res) {
 
-          db = dbController.getAll();
 
           db.all("SELECT rowid AS id, NoteMessage,isDone FROM TODONOTES", function(err, rows) {
             arr = [];
@@ -255,9 +260,52 @@ var serverController = (function() {
              res.json(arr);
 
         });
+      });
 
+        app.get("/getWaitedNotes", function(req, res) {
+
+
+          db.all("SELECT rowid AS id, NoteMessage,isDone FROM TODONOTES WHERE isDone=0", function(err, rows) {
+            arr = [];
+            arr2 = [];
+            var x = " ";
+            rows.forEach(function (row) {
+
+              var newRow = new rowObj(row.id, row.NoteMessage,row.isDone);
+              arr.push(newRow);
+              // arr2.push(row.NoteMessage)
+            });
+            
+            //  res.json(JSON.stringify(arr));
+             res.json(arr);
 
         });
+
+        app.get("/getDoneNotes", function(req, res) {
+
+
+          db.all("SELECT rowid AS id, NoteMessage,isDone FROM TODONOTES WHERE isDone=1", function(err, rows) {
+            arr = [];
+            arr2 = [];
+            var x = " ";
+            rows.forEach(function (row) {
+
+              var newRow = new rowObj(row.id, row.NoteMessage,row.isDone);
+              arr.push(newRow);
+              // arr2.push(row.NoteMessage)
+            });
+            
+            //  res.json(JSON.stringify(arr));
+             res.json(arr);
+
+        });
+
+
+
+      });
+    });
+ 
+    
 
 })();
 

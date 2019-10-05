@@ -56,28 +56,32 @@ public class ToDoUI extends JFrame {
 	public void refreshList1() {
 		removeAll();
 //		addList(swingJList,model);
-		addList();
-		
+		refreshWaitedList();
+		refreshDoneList();
 		
 	}
 	
-	public void addList() {
+	public void refreshWaitedList() {
+		String[] mylist = uiController.getWaitedList();
 
-		String[] mylist = uiController.getMsgList();
 		for(int i =0; i < mylist.length; ++i) {
-			if(uiController.isDone(i)) {
-				System.out.println("add to completeModel");
-				completeModel.addElement(mylist[i]);
-
-			}else {
-				
-				System.out.println("add to todoModel");
-
-				todoModel.addElement(mylist[i]);
-			}
+			todoModel.addElement(mylist[i]);
+			
 		}
-		    
+
 	}
+	
+	public void refreshDoneList() {
+		String[] mylist = uiController.getDoneList();
+
+		for(int i =0; i < mylist.length; ++i) {
+			completeModel.addElement(mylist[i]);
+			
+		}
+
+	}
+	
+
 	
 	public void removeAll() {
 	
@@ -161,10 +165,9 @@ public class ToDoUI extends JFrame {
           ListSelectionModel selmodel = todoList.getSelectionModel();
           int index = selmodel.getMinSelectionIndex();
           if (index >= 0) {
-//        	uiController.toggleIsDone(index);
-          	String msg = todoModel.get(index);
-          	completeModel.addElement(msg);
-//          	refreshList1();
+        	uiController.toggleIsDone(index);
+          	String msg = todoModel.get(index);          	
+          	refreshList1();
           }
 
         }
@@ -219,13 +222,15 @@ public class ToDoUI extends JFrame {
         todoPanel = new JScrollPane(todoList);
         createListPanel(todoList,  todoModel, todoPanel);
         p1.add(todoPanel);
- 
+        refreshWaitedList();
     }
     
 //    void createCompleteListPanel(){
     
 //    }
-    
+//	public void refreshWaitedList() {
+//
+//	public void refreshDoneList() {
     void createCompleteListPanel(){
     	
     	 p2= addPanel(middlePanel, Color.GRAY, "");
@@ -236,6 +241,7 @@ public class ToDoUI extends JFrame {
          completePanel = new JScrollPane(completeList);
          createListPanel(completeList,  completeModel, completePanel);
          p2.add(completePanel);
+         refreshDoneList();
    
     }
     
@@ -251,7 +257,7 @@ public class ToDoUI extends JFrame {
         createHeaderPanel();
         createToDoListPanel();
         createCompleteListPanel();
-    	addList();
+//    	addList();
 
  
          
@@ -552,4 +558,23 @@ public class ToDoUI extends JFrame {
 ////		// default L&F.
 ////		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 ////	}
+//}
+
+
+//public void addList() {
+//
+//	String[] mylist = uiController.getMsgList();
+//	for(int i =0; i < mylist.length; ++i) {
+//		if(uiController.isDone(i)) {
+//			System.out.println("add to completeModel");
+//			completeModel.addElement(mylist[i]);
+//
+//		}else {
+//			
+//			System.out.println("add to todoModel");
+//
+//			todoModel.addElement(mylist[i]);
+//		}
+//	}
+//	    
 //}

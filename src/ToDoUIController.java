@@ -87,7 +87,7 @@ public class ToDoUIController {
         String[] getMsgList(){
           Object json = null;
           try {
-             json = getResponse("getDb");
+             json = getResponse("getWaitedNotes");
             
             } catch(IOException ioe) {
                 ioe.printStackTrace();
@@ -106,6 +106,54 @@ public class ToDoUIController {
             return res;
     
         }
+        
+        
+        String[] getDoneList(){
+            Object json = null;
+            try {
+               json = getResponse("getDoneNotes");
+              
+              } catch(IOException ioe) {
+                  ioe.printStackTrace();
+              }
+            
+              Note[] arr  = convertJsonToArr(json);
+              String[] res = new String[arr.length];
+              
+              for(int i = 0; i < arr.length; ++i){
+                  res[i] = arr[i].getMsg();
+                  System.out.println(res[i]);
+
+              }
+             
+
+              return res;
+      
+          }
+        
+        
+        String[] getWaitedList(){
+            Object json = null;
+            try {
+               json = getResponse("getWaitedNotes");
+              
+              } catch(IOException ioe) {
+                  ioe.printStackTrace();
+              }
+            
+              Note[] arr  = convertJsonToArr(json);
+              String[] res = new String[arr.length];
+              
+              for(int i = 0; i < arr.length; ++i){
+                  res[i] = arr[i].getMsg();
+                  System.out.println(res[i]);
+
+              }
+             
+
+              return res;
+      
+          }
         
         Note[] getNoteList(){
             Object json = null;
@@ -130,21 +178,7 @@ public class ToDoUIController {
           }
         
 
-        
-//        void updateNote(Integer id, String updateMsg){
-//        	
-//        	String url = serverUrl+"updateNote";
-//    		String ID = "id=" +id.toString();
-//    		String UPDATE = "NoteMessage=updateMsg";
-//    		
-//    		try {
-//                String body = post(url, ID, UPDATE);
-//            
-//                System.out.println(body);
-//            } catch(IOException ioe) {
-//                ioe.printStackTrace();
-//            }
-//        }
+      
 	
 	public Note[] convertJsonToArr(Object json) {
 		
@@ -261,6 +295,8 @@ public class ToDoUIController {
     boolean isDone(int id) {
     	Note[] noteList = getNoteList();
 		int isComplete = noteList[id].getIsDone();
+		System.out.println(noteList[id].getId());
+		System.out.println("is complete ? " + (isComplete == 1));
 		return (isComplete == 1);
 		
     }
@@ -283,11 +319,12 @@ public class ToDoUIController {
 
                 
 		ToDoUIController hce = new ToDoUIController();
+		hce.toggleIsDone(0);
 
-		
+		hce.isDone(0);
 //		hce.isDone(0);
 		
-		System.out.println(hce.isDone(1));
+//		System.out.println(hce.isDone(1));
 //		hce.updateNote(1, "tal");
 //		hce.removeAll();
 //		hce.getNoteList();
