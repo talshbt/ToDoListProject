@@ -147,9 +147,22 @@ var serverController = (function() {
       app.post("/deleteNote", function(req, res) {
         
         let test = parseInt(req.body.id);
-        
         dbController.deleteNote(test);
+        res.send(`${test} removed.`);
+
         console.log("---------------remove now " + test);
+        dbController.read();
+      
+      
+      });
+
+      app.post("/updateNote", function(req, res) {
+        
+        let test = parseInt(req.body.id);
+        dbController.update(test);
+        res.send(`${test} edit.`);
+
+        console.log("---------------update now " + test);
         dbController.read();
       
       

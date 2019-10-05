@@ -57,32 +57,32 @@ class Constants {
 
 }
 
-
-@SuppressWarnings("serial")
-class SwingJList<T> extends JList<T> {
-
-	public SwingJList(List<T> listData) {
-
-		super(new DefaultListModel<T>());
-		for(T element: listData) {
-			addElement(element);
-		}
-
-
-		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-	}
-
-	public void addElement(T element) {
-		((DefaultListModel<T>) getModel()).add(Constants.NEW_ELEMENT_IDX,
-				element);
-	}
-
-	public void removeElement(Object element) {
-		((DefaultListModel<T>) getModel()).removeElement(element);
-	}
-
-}
+//
+//@SuppressWarnings("serial")
+//class SwingJList<T> extends JList<T> {
+//
+//	public SwingJList(List<T> listData) {
+//
+//		super(new DefaultListModel<T>());
+//		for(T element: listData) {
+//			addElement(element);
+//		}
+//
+//
+//		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//
+//	}
+//
+//	public void addElement(T element) {
+//		((DefaultListModel<T>) getModel()).add(Constants.NEW_ELEMENT_IDX,
+//				element);
+//	}
+//
+//	public void removeElement(Object element) {
+//		((DefaultListModel<T>) getModel()).removeElement(element);
+//	}
+//
+//}
  
 public class ToDoUI extends JFrame {
     ToDoUIController hce = new ToDoUIController();
@@ -91,9 +91,32 @@ public class ToDoUI extends JFrame {
     JPanel p1,p2,p3;
     GridLayout gridLayout;
     JButton addButton, deleteButton, editButton; 
-    SwingJList<String> swingJList;
+//    SwingJList<String> swingJList;
     JScrollPane buttomPanel;
     ToDoUIController uiController;
+    JList<String> swingJList;
+    DefaultListModel<String> model;
+    
+	public void refreshList1() {
+		removeAll();
+		addList();
+	}
+	
+	public void addList() {
+		String[] mylist = uiController.getMsgList();
+		for(int i =0; i < mylist.length; ++i) {
+				model.addElement(mylist[i]);
+			 }
+		    
+	}
+	
+	public void removeAll() {
+	
+	      model.clear();
+	}
+	
+	
+	
     
     public void createTopPanel(JPanel topPannel){
         final JTextField nameField = new JTextField(14);
@@ -110,7 +133,7 @@ public class ToDoUI extends JFrame {
                         if (name != null && !"".equals(name)) {
                             String note1 = name;
                             uiController.addNewNote(note1);
-                            refreshList();
+                            refreshList1();
                         } else {
                                 JOptionPane.showMessageDialog(null,
                                                 "Employee name is empty", "Error",
@@ -119,50 +142,35 @@ public class ToDoUI extends JFrame {
                 }
         });
         
-//        deleteButton.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				DefaultListModel model = (DefaultListModel) swingJList.getModel();
-//				int selectedIndex = swingJList.getModel().getSize() - swingJList.getSelectedIndex() -1;
-//				if (selectedIndex != -1) {
-//                    uiController.deleteItem(selectedIndex);
-//                    refreshList();
-//
-//				}
-				
-				
-				
-				
-//				    int[] selectedIx = swingJList.getSelectedIndices();
-//				    Integer firstSelIx = swingJList.getModel().getSize()- swingJList.getSelectedIndex() -1 ;
-//				    System.out.println("index id = " + firstSelIx);
-//                    uiController.deleteItem(firstSelIx);
-//                    createGui();
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+              ListSelectionModel selmodel = swingJList.getSelectionModel();
+              int index = selmodel.getMinSelectionIndex();
+              if (index >= 0) {
+            	nameField.setText(model.get(index)); 
+            	 String text = JOptionPane.showInputDialog("Add a new item");
+                 String item =text.trim();
+//              	refreshList1();
+              }
 
-					
-				
-//			}
-//		});
-//        
-        deleteButton.addActionListener(new ActionListener() {  
-            
-            public void actionPerformed(ActionEvent e) {   
-                String data = "";  
-                if (swingJList.getSelectedIndex() != -1) {                       
-                    data = "OS Type Selected: " + swingJList.getSelectedValue();
-                    Integer ind = swingJList.getSelectedIndex();
-                    nameField.setText(ind.toString());  
-                }  
-//                if(swingJList.getSelectedIndex() != -1){  
-//                    data += ", Oprating System Selected: ";  
-//                    for(Object f :swingJList.getSelectedValues()){  
-//                       data += f + " ";  
-//                    }  
-//                }  
-//                label.setText(data);  
             }
-            
-        });     
-    
+
+          });
+        
+        
+        deleteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+              ListSelectionModel selmodel = swingJList.getSelectionModel();
+              int index = selmodel.getMinSelectionIndex();
+              if (index >= 0)
+              	uiController.deleteItem(index);
+              	refreshList1();
+
+            }
+
+          });
+
+
 
         topPannel.add(nameField);
         topPannel.add(addButton);
@@ -196,13 +204,21 @@ public class ToDoUI extends JFrame {
         p1= addPanel(middlePanel, Color.GRAY, "");
         addTitleToPanel(p1, "To Do");
         p1.setBackground(new Color(0, 100, 255, 15));
-        swingJList = new SwingJList<String>(Arrays.asList(Constants.LIST_DATA));
+       
+        model = new DefaultListModel<String>();
+        swingJList = new JList<String>(model);
+        addList();
         swingJList.setBackground(Color.WHITE);
         swingJList.setCellRenderer(getRenderer());
         buttomPanel = new JScrollPane(swingJList);
         buttomPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
         buttomPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
         buttomPanel.setPreferredSize(new Dimension(400, 300));
+        
+  
+        
+     
+        
 
         p1.add(buttomPanel);
  

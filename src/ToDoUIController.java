@@ -172,6 +172,23 @@ public class ToDoUIController {
                 ioe.printStackTrace();
             }
         }
+        
+        void updateNote(Integer id){
+        	
+    		Note[] noteList = getNoteList();
+    		id = noteList[id].getId();
+    		System.out.println("real index is = " + id);
+        	String url = serverUrl+"deleteNote";
+    		String ID = "id=" +id.toString();
+
+    		try {
+                String body = post(url, ID);
+                
+                System.out.println(body);
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
 	
 	public Note[] convertJsonToArr(Object json) {
 		
