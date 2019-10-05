@@ -56,59 +56,7 @@ public class ToDoUIController {
         }
     }
     
-//    public String post(String postUrl, String data) throws IOException {
-//        URL url = new URL(postUrl);
-//        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-//        con.setRequestMethod("POST");
-//
-//        con.setDoOutput(true);
-//
-//        this.sendData(con, data);
-//
-//        return this.read(con.getInputStream());
-//    }
-//    
-//    
-//    public String post(String postUrl, String data1, String data2) throws IOException {
-//        URL url = new URL(postUrl);
-//        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-//        con.setRequestMethod("POST");
-//
-//        con.setDoOutput(true);
-//
-//        this.sendData(con, data1, data2);
-//
-//        return this.read(con.getInputStream());
-//    }
-    
-//    protected void sendData(HttpURLConnection con, String data) throws IOException {
-//        DataOutputStream wr = null;
-//        try {
-//            wr = new DataOutputStream(con.getOutputStream());
-//            wr.writeBytes(data);
-//            wr.flush();
-//            wr.close();
-//        } catch(IOException exception) {
-//            throw exception;
-//        } finally {
-//            this.closeQuietly(wr);
-//        }
-//    }
-//    
-//    protected void sendData(HttpURLConnection con, String data1, String data2) throws IOException {
-//        DataOutputStream wr = null;
-//        try {
-//            wr = new DataOutputStream(con.getOutputStream());
-//            wr.writeBytes(data1);
-//            wr.writeBytes(data2);
-//            wr.flush();
-//            wr.close();
-//        } catch(IOException exception) {
-//            throw exception;
-//        } finally {
-//            this.closeQuietly(wr);
-//        }
-//    }
+
     
 	public Object getResponse(String request) throws IOException {
 		
@@ -309,16 +257,39 @@ public class ToDoUIController {
 		}
     }
     
-
     
+    boolean isDone(int id) {
+    	Note[] noteList = getNoteList();
+		int isComplete = noteList[id].getIsDone();
+		return (isComplete == 1);
+		
+    }
+    
+    void toggleIsDone(Integer id){
+    	
+    	Note[] noteList = getNoteList();
+		id = noteList[id].getId();
+	    Map<String, String> params = new HashMap<String, String>();
+	    params.put("id", id.toString());
+	    try {
+			writePostData("toggleIsDone",  params);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
   
     
 	public static void main(String[] args) throws IOException {
 
                 
 		ToDoUIController hce = new ToDoUIController();
+
+		
+//		hce.isDone(0);
+		
+		System.out.println(hce.isDone(1));
 //		hce.updateNote(1, "tal");
-		hce.removeAll();
+//		hce.removeAll();
 //		hce.getNoteList();
 		
 //	    Map<String, String> params = new HashMap<String, String>();
@@ -366,5 +337,57 @@ public class ToDoUIController {
 //}
 //
 //
+//public String post(String postUrl, String data) throws IOException {
+//URL url = new URL(postUrl);
+//HttpURLConnection con = (HttpURLConnection) url.openConnection();
+//con.setRequestMethod("POST");
+//
+//con.setDoOutput(true);
+//
+//this.sendData(con, data);
+//
+//return this.read(con.getInputStream());
+//}
+//
+//
+//public String post(String postUrl, String data1, String data2) throws IOException {
+//URL url = new URL(postUrl);
+//HttpURLConnection con = (HttpURLConnection) url.openConnection();
+//con.setRequestMethod("POST");
+//
+//con.setDoOutput(true);
+//
+//this.sendData(con, data1, data2);
+//
+//return this.read(con.getInputStream());
+//}
 
+//protected void sendData(HttpURLConnection con, String data) throws IOException {
+//DataOutputStream wr = null;
+//try {
+//  wr = new DataOutputStream(con.getOutputStream());
+//  wr.writeBytes(data);
+//  wr.flush();
+//  wr.close();
+//} catch(IOException exception) {
+//  throw exception;
+//} finally {
+//  this.closeQuietly(wr);
+//}
+//}
+//
+//protected void sendData(HttpURLConnection con, String data1, String data2) throws IOException {
+//DataOutputStream wr = null;
+//try {
+//  wr = new DataOutputStream(con.getOutputStream());
+//  wr.writeBytes(data1);
+//  wr.writeBytes(data2);
+//  wr.flush();
+//  wr.close();
+//} catch(IOException exception) {
+//  throw exception;
+//} finally {
+//  this.closeQuietly(wr);
+//}
+//}
 	

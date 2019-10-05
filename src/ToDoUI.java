@@ -47,28 +47,42 @@ public class ToDoUI extends JFrame {
     JPanel headerPanel,headerPanel2, footerPanel, middlePanel;
     JPanel p1,p2,p3;
     GridLayout gridLayout;
-    JButton addButton, deleteButton, editButton, deleteAll; 
-    JScrollPane buttomPanel;
+    JButton addButton, doneButton, deleteButton, editButton, deleteAll; 
+    JScrollPane todoPanel, completePanel;
     ToDoUIController uiController;
-    JList<String> swingJList;
-    DefaultListModel<String> model;
+    JList<String> todoList, completeList;
+    DefaultListModel<String> todoModel, completeModel;
     
 	public void refreshList1() {
 		removeAll();
+//		addList(swingJList,model);
 		addList();
+		
+		
 	}
 	
 	public void addList() {
+
 		String[] mylist = uiController.getMsgList();
 		for(int i =0; i < mylist.length; ++i) {
-				model.addElement(mylist[i]);
-			 }
+			if(uiController.isDone(i)) {
+				System.out.println("add to completeModel");
+				completeModel.addElement(mylist[i]);
+
+			}else {
+				
+				System.out.println("add to todoModel");
+
+				todoModel.addElement(mylist[i]);
+			}
+		}
 		    
 	}
 	
 	public void removeAll() {
 	
-	      model.clear();
+	      todoModel.clear();
+	      completeModel.clear();
 	}
 	
     
@@ -79,7 +93,7 @@ public class ToDoUI extends JFrame {
         deleteButton = new JButton("Delete");
         editButton = new JButton("Edit");
         deleteAll = new JButton("Delete All");
-
+        doneButton = new JButton("Done");
         addButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                         String name = nameField.getText();
@@ -98,11 +112,11 @@ public class ToDoUI extends JFrame {
         
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              ListSelectionModel selmodel = swingJList.getSelectionModel();
+              ListSelectionModel selmodel = todoList.getSelectionModel();
               int index = selmodel.getMinSelectionIndex();
               if (index == -1)
                 return;
-              Object item = model.getElementAt(index);
+              Object item = todoModel.getElementAt(index);
               String text = JOptionPane.showInputDialog("Rename item", item);
               String newitem = null;
 
@@ -122,7 +136,7 @@ public class ToDoUI extends JFrame {
         
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-              ListSelectionModel selmodel = swingJList.getSelectionModel();
+              ListSelectionModel selmodel = todoList.getSelectionModel();
               int index = selmodel.getMinSelectionIndex();
               if (index >= 0)
               	uiController.deleteNote(index);
@@ -139,12 +153,30 @@ public class ToDoUI extends JFrame {
                  
             }
     });
+        
+        
+        
+        doneButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+          ListSelectionModel selmodel = todoList.getSelectionModel();
+          int index = selmodel.getMinSelectionIndex();
+          if (index >= 0) {
+//        	uiController.toggleIsDone(index);
+          	String msg = todoModel.get(index);
+          	completeModel.addElement(msg);
+//          	refreshList1();
+          }
+
+        }
+
+      });
 
         topPannel.add(nameField);
         topPannel.add(addButton);
         topPannel.add(editButton);
         topPannel.add(deleteButton);
         topPannel.add(deleteAll);
+        topPannel.add(doneButton);
 
                 
     }
@@ -170,31 +202,41 @@ public class ToDoUI extends JFrame {
 
     }
     
+    void createListPanel(JList<String> list, DefaultListModel<String> model,JScrollPane panel){
+    	list.setBackground(Color.WHITE);
+    	list.setCellRenderer(getRenderer());
+    	panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
+    	panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
+    	panel.setPreferredSize(new Dimension(500, 400));
+    }
+    
     void createToDoListPanel(){
         p1= addPanel(middlePanel, Color.GRAY, "");
         addTitleToPanel(p1, "To Do");
         p1.setBackground(new Color(0, 100, 255, 15));
-       
-        model = new DefaultListModel<String>();
-        swingJList = new JList<String>(model);
-        addList();
-        swingJList.setBackground(Color.WHITE);
-        swingJList.setCellRenderer(getRenderer());
-        buttomPanel = new JScrollPane(swingJList);
-        buttomPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
-        buttomPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
-        buttomPanel.setPreferredSize(new Dimension(500, 400));
-        
-        p1.add(buttomPanel);
+        todoModel = new DefaultListModel<String>();
+        todoList = new JList<String>(todoModel);
+        todoPanel = new JScrollPane(todoList);
+        createListPanel(todoList,  todoModel, todoPanel);
+        p1.add(todoPanel);
  
     }
     
+//    void createCompleteListPanel(){
+    
+//    }
+    
     void createCompleteListPanel(){
-        p2= addPanel(middlePanel, Color.GRAY, "");
-       
-        addTitleToPanel(p2, "Complete");
-
-        p2.setBackground(new Color(0, 100, 255, 15));
+    	
+    	 p2= addPanel(middlePanel, Color.GRAY, "");
+         addTitleToPanel(p2, "Complete");
+         p2.setBackground(new Color(0, 100, 255, 15));
+         completeModel = new DefaultListModel<String>();
+         completeList = new JList<String>(completeModel);
+         completePanel = new JScrollPane(completeList);
+         createListPanel(completeList,  completeModel, completePanel);
+         p2.add(completePanel);
+   
     }
     
     
@@ -209,6 +251,7 @@ public class ToDoUI extends JFrame {
         createHeaderPanel();
         createToDoListPanel();
         createCompleteListPanel();
+    	addList();
 
  
          
@@ -347,21 +390,6 @@ public class ToDoUI extends JFrame {
    }
      
         
-    public static void setLookAndFeel(String lf) throws Exception {
-		// Set Nimbus as L&F
-//		try {
-//			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-//				if (lf.equals(info.getName())) {
-//					UIManager.setLookAndFeel(info.getClassName());
-//					break;
-//				}
-//			}
-//		} catch (Exception e) {
-//			// If Nimbus is not available, you can set the GUI the system
-//			// default L&F.
-//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//		}
-	}
 
    
     @SuppressWarnings("unchecked")
@@ -506,3 +534,22 @@ public class ToDoUI extends JFrame {
 //
 //      mainFrame.setVisible(true);  
 //   }
+
+
+
+
+//public static void setLookAndFeel(String lf) throws Exception {
+//	// Set Nimbus as L&F
+////	try {
+////		for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+////			if (lf.equals(info.getName())) {
+////				UIManager.setLookAndFeel(info.getClassName());
+////				break;
+////			}
+////		}
+////	} catch (Exception e) {
+////		// If Nimbus is not available, you can set the GUI the system
+////		// default L&F.
+////		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+////	}
+//}

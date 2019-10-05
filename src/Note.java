@@ -9,7 +9,7 @@ public class Note {
 
 	@Override
 	public String toString() {
-		return String.format("id:" +this.id + " msg: "+this.msg); 
+		return String.format("id:" +this.id + " msg: "+this.msg +" "+ this.isDone); 
 	}
 
 	public String getMsg() {
@@ -30,6 +30,17 @@ public class Note {
 		this.id = id;
 	}
 
+	Integer isDone;
+
+	public Integer getIsDone() {
+		return isDone;
+	}
+
+	public void setIsDone(Integer isDone) {
+		this.isDone = isDone;
+	}
+	
+	
 
 
 	
