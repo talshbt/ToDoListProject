@@ -84,7 +84,6 @@ public class ToDoUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                         String name = nameField.getText();
                                 
-                       
                         if (name != null && !"".equals(name)) {
                             String note1 = name;
                             uiController.addNewNote(note1);

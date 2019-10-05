@@ -16,6 +16,8 @@ var dbController = (function() {
 
     return {
 
+
+
       
         initDB: function() {
             let db = new sqlite3.Database("./mydb.sqlite3", (err) => { 
@@ -34,7 +36,7 @@ var dbController = (function() {
                 console.log("Read data from TODONOTES");
                 db.all("SELECT rowid AS id, NoteMessage FROM TODONOTES", function(err, rows) {
                     rows.forEach(function (row) {
-                        console.log(row.id + ": " + row.NoteMessage);
+                        console.log(row.id + ": " + row.NoteMessage + ":" + row.isDone);
                     });
 
 
@@ -43,9 +45,32 @@ var dbController = (function() {
 
               },
 
+              readSchema: function (){
 
+                console.log("Read data from TODONOTES");
+                db.all(`SELECT sql 
+                FROM sqlite_master 
+                WHERE name = 'TODONOTES';`, function(err, rows) {
+                    rows.forEach(function (row) {
+                        console.log(row);
+                    });
+                });
+
+
+              },
+
+        toggleIsDone: function (id){
+
+
+          db.run(`UPDATE TODONOTES SET isDone=CASE WHEN isDone < 1 THEN (isDone + 1) ELSE 0 END WHERE id=${id}`)
+
+                console.log("toggleIsDone for id: ",id);
+
+
+          },    
+        
           initNoteTable: function (NoteMessage){
-                let sqlCommand = "CREATE TABLE IF NOT EXISTS TODONOTES(id INTEGER PRIMARY KEY AUTOINCREMENT, NoteMessage TEXT)";
+                let sqlCommand = "CREATE TABLE IF NOT EXISTS TODONOTES(id INTEGER PRIMARY KEY AUTOINCREMENT, NoteMessage TEXT, isDone INTEGER DEFAULT 0 NOT NULL)";
                 db.run(sqlCommand);
                 console.log("create database table TODONOTES");
           },    
@@ -84,14 +109,6 @@ var dbController = (function() {
             },
             getAll: function (){
               return db.all(`SELECT * FROM TODONOTES`)
-
-
-
-              
-              // console.log(s.arr);
-
-              // db.close();
-
             },
             test: function(){
               getData();
@@ -111,11 +128,18 @@ var dbController = (function() {
 
 var db = dbController.initDB();
 dbController.initNoteTable();
-//dbController.truncate();
+
 
 var serverController = (function() {
 
-    
+
+    app.get('/readSchema', function(req,res){
+      dbController.readSchema();
+      res.send("FuckOFF");
+
+    });
+
+
     app.get('/', function(req,res){
         res.send("Welcome to Invoicing App");
       });
@@ -151,6 +175,19 @@ var serverController = (function() {
         res.send(`${test} removed.`);
 
         console.log("---------------remove now " + test);
+        dbController.read();
+      
+      
+      });
+
+
+      app.post("/toggleIsDone", function(req, res) {
+        
+        let test = parseInt(req.body.id);
+        dbController.toggleIsDone(test);
+        res.send(`${test} update.`);
+
+        // console.log("---------------remove now " + test);
         dbController.read();
       
       
@@ -193,22 +230,23 @@ var serverController = (function() {
         });
 
        
-        function rowObj(id, NoteMessage) {
+        function rowObj(id, NoteMessage,isDone) {
           this.id = id;
           this.msg = NoteMessage;
+          this.isDone = isDone;
         }
 
         app.get("/getDb", function(req, res) {
 
           db = dbController.getAll();
 
-          db.all("SELECT rowid AS id, NoteMessage FROM TODONOTES", function(err, rows) {
+          db.all("SELECT rowid AS id, NoteMessage,isDone FROM TODONOTES", function(err, rows) {
             arr = [];
             arr2 = [];
             var x = " ";
             rows.forEach(function (row) {
 
-              var newRow = new rowObj(row.id, row.NoteMessage);
+              var newRow = new rowObj(row.id, row.NoteMessage,row.isDone);
               arr.push(newRow);
               // arr2.push(row.NoteMessage)
             });
