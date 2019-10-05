@@ -36,62 +36,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 
 
 
 
-class Constants {
-    
-        public static void getList(String[] list){
-            LIST_DATA = list;
-        }
-
-	public static final String NIMBUS_LF = "Nimbus";
-      
-	public static String[] LIST_DATA = null;
-
-	public static final int NEW_ELEMENT_IDX = 0;
-
-}
-
-//
-//@SuppressWarnings("serial")
-//class SwingJList<T> extends JList<T> {
-//
-//	public SwingJList(List<T> listData) {
-//
-//		super(new DefaultListModel<T>());
-//		for(T element: listData) {
-//			addElement(element);
-//		}
-//
-//
-//		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//
-//	}
-//
-//	public void addElement(T element) {
-//		((DefaultListModel<T>) getModel()).add(Constants.NEW_ELEMENT_IDX,
-//				element);
-//	}
-//
-//	public void removeElement(Object element) {
-//		((DefaultListModel<T>) getModel()).removeElement(element);
-//	}
-//
-//}
- 
 public class ToDoUI extends JFrame {
     ToDoUIController hce = new ToDoUIController();
     JFrame mainFrame;
     JPanel headerPanel,headerPanel2, footerPanel, middlePanel;
     JPanel p1,p2,p3;
     GridLayout gridLayout;
-    JButton addButton, deleteButton, editButton; 
-//    SwingJList<String> swingJList;
+    JButton addButton, deleteButton, editButton, deleteAll; 
     JScrollPane buttomPanel;
     ToDoUIController uiController;
     JList<String> swingJList;
@@ -115,8 +71,6 @@ public class ToDoUI extends JFrame {
 	      model.clear();
 	}
 	
-	
-	
     
     public void createTopPanel(JPanel topPannel){
         final JTextField nameField = new JTextField(14);
@@ -124,7 +78,8 @@ public class ToDoUI extends JFrame {
         addButton = new JButton("Add");
         deleteButton = new JButton("Delete");
         editButton = new JButton("Edit");
-        
+        deleteAll = new JButton("Delete All");
+
         addButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                         String name = nameField.getText();
@@ -143,18 +98,26 @@ public class ToDoUI extends JFrame {
         });
         
         editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+            public void actionPerformed(ActionEvent e) {
               ListSelectionModel selmodel = swingJList.getSelectionModel();
               int index = selmodel.getMinSelectionIndex();
-              if (index >= 0) {
-            	nameField.setText(model.get(index)); 
-            	 String text = JOptionPane.showInputDialog("Add a new item");
-                 String item =text.trim();
-//              	refreshList1();
+              if (index == -1)
+                return;
+              Object item = model.getElementAt(index);
+              String text = JOptionPane.showInputDialog("Rename item", item);
+              String newitem = null;
+
+              if (text != null) {
+                newitem = text.trim();
+              } else
+                return;
+
+              if (!newitem.isEmpty()) {
+
+            	  uiController.updateNote(index, newitem);
+            	  refreshList1();
               }
-
             }
-
           });
         
         
@@ -163,19 +126,27 @@ public class ToDoUI extends JFrame {
               ListSelectionModel selmodel = swingJList.getSelectionModel();
               int index = selmodel.getMinSelectionIndex();
               if (index >= 0)
-              	uiController.deleteItem(index);
+              	uiController.deleteNote(index);
               	refreshList1();
 
             }
 
           });
 
-
+        deleteAll.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	uiController.removeAll();
+              	refreshList1();
+                 
+            }
+    });
 
         topPannel.add(nameField);
         topPannel.add(addButton);
         topPannel.add(editButton);
         topPannel.add(deleteButton);
+        topPannel.add(deleteAll);
+
                 
     }
     private ListCellRenderer<? super String> getRenderer() {
@@ -213,13 +184,8 @@ public class ToDoUI extends JFrame {
         buttomPanel = new JScrollPane(swingJList);
         buttomPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);  
         buttomPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
-        buttomPanel.setPreferredSize(new Dimension(400, 300));
+        buttomPanel.setPreferredSize(new Dimension(500, 400));
         
-  
-        
-     
-        
-
         p1.add(buttomPanel);
  
     }
@@ -235,7 +201,7 @@ public class ToDoUI extends JFrame {
     
     
     void createGui(){
-        Constants.getList(uiController.getMsgList());
+//        Constants.getList(uiController.getMsgList());
         gridLayout = new GridLayout(0,1);
        
         footerPanel = addPanel("South", Color.BLUE, "footer");
@@ -372,7 +338,7 @@ public class ToDoUI extends JFrame {
       SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					setLookAndFeel(Constants.NIMBUS_LF);
+//					setLookAndFeel(Constants.NIMBUS_LF);
 					ToDoUI  todo = new ToDoUI(); 
 				} catch (Exception e) {
 					e.printStackTrace();

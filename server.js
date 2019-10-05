@@ -158,11 +158,14 @@ var serverController = (function() {
 
       app.post("/updateNote", function(req, res) {
         
-        let test = parseInt(req.body.id);
-        dbController.update(test);
-        res.send(`${test} edit.`);
+        let id = parseInt(req.body.id);
 
-        console.log("---------------update now " + test);
+        let msg = (req.body.NoteMessage);
+
+        console.log(msg);
+        dbController.update(msg, id);
+        res.send(`${id} successfully updated.`);
+        console.log(`${id} successfully updated.`);
         dbController.read();
       
       

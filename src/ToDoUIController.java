@@ -7,10 +7,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 
@@ -51,33 +56,59 @@ public class ToDoUIController {
         }
     }
     
-    public String post(String postUrl, String data) throws IOException {
-        URL url = new URL(postUrl);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-
-        con.setDoOutput(true);
-
-        this.sendData(con, data);
-
-        return this.read(con.getInputStream());
-    }
+//    public String post(String postUrl, String data) throws IOException {
+//        URL url = new URL(postUrl);
+//        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+//        con.setRequestMethod("POST");
+//
+//        con.setDoOutput(true);
+//
+//        this.sendData(con, data);
+//
+//        return this.read(con.getInputStream());
+//    }
+//    
+//    
+//    public String post(String postUrl, String data1, String data2) throws IOException {
+//        URL url = new URL(postUrl);
+//        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+//        con.setRequestMethod("POST");
+//
+//        con.setDoOutput(true);
+//
+//        this.sendData(con, data1, data2);
+//
+//        return this.read(con.getInputStream());
+//    }
     
-    protected void sendData(HttpURLConnection con, String data) throws IOException {
-        DataOutputStream wr = null;
-        try {
-            wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(data);
-            wr.flush();
-            wr.close();
-        } catch(IOException exception) {
-            throw exception;
-        } finally {
-            this.closeQuietly(wr);
-        }
-    }
-    
-   
+//    protected void sendData(HttpURLConnection con, String data) throws IOException {
+//        DataOutputStream wr = null;
+//        try {
+//            wr = new DataOutputStream(con.getOutputStream());
+//            wr.writeBytes(data);
+//            wr.flush();
+//            wr.close();
+//        } catch(IOException exception) {
+//            throw exception;
+//        } finally {
+//            this.closeQuietly(wr);
+//        }
+//    }
+//    
+//    protected void sendData(HttpURLConnection con, String data1, String data2) throws IOException {
+//        DataOutputStream wr = null;
+//        try {
+//            wr = new DataOutputStream(con.getOutputStream());
+//            wr.writeBytes(data1);
+//            wr.writeBytes(data2);
+//            wr.flush();
+//            wr.close();
+//        } catch(IOException exception) {
+//            throw exception;
+//        } finally {
+//            this.closeQuietly(wr);
+//        }
+//    }
     
 	public Object getResponse(String request) throws IOException {
 		
@@ -95,6 +126,14 @@ public class ToDoUIController {
 		
 		return content;
 	}
+	
+		void removeAll() {
+			 try {
+				getResponse("truncate");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
         
         
         String[] getMsgList(){
@@ -142,53 +181,22 @@ public class ToDoUIController {
       
           }
         
-        void deleteItem(Integer id){
-        	
-    		Note[] noteList = getNoteList();
-    		id = noteList[id].getId();
-    		System.out.println("real index is = " + id);
-        	String url = serverUrl+"deleteNote";
-    		String ID = "id=" +id.toString();
 
-    		try {
-                String body = post(url, ID);
-                
-                System.out.println(body);
-            } catch(IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
         
-        
-        void addNewNote(String note){
-        	String url = serverUrl+"addNote";
-    		String newNote = "NoteMessage=" +note;
-
-    		try {
-                String body = post(url, newNote);
-                
-                System.out.println(body);
-            } catch(IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
-        
-        void updateNote(Integer id){
-        	
-    		Note[] noteList = getNoteList();
-    		id = noteList[id].getId();
-    		System.out.println("real index is = " + id);
-        	String url = serverUrl+"deleteNote";
-    		String ID = "id=" +id.toString();
-
-    		try {
-                String body = post(url, ID);
-                
-                System.out.println(body);
-            } catch(IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
+//        void updateNote(Integer id, String updateMsg){
+//        	
+//        	String url = serverUrl+"updateNote";
+//    		String ID = "id=" +id.toString();
+//    		String UPDATE = "NoteMessage=updateMsg";
+//    		
+//    		try {
+//                String body = post(url, ID, UPDATE);
+//            
+//                System.out.println(body);
+//            } catch(IOException ioe) {
+//                ioe.printStackTrace();
+//            }
+//        }
 	
 	public Note[] convertJsonToArr(Object json) {
 		
@@ -209,14 +217,99 @@ public class ToDoUIController {
 		return pp1;
 	}
 	
-	String[] getArrayOfNotes(String json){
-		json = json.replace("[", ""); 
-		json = json.replace("]", ""); 
-		json = json.replace("\"", ""); 
-		json = json.replace("\\", ""); 
-
-		return json.split(",");    
+	
+	List<Object> postData(String req,  Map<String, String> params) throws IOException {
+		List<Object> list = new ArrayList<>();
+		URL url = new URL(serverUrl + req);
+	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	    connection.setRequestMethod("POST");
+		StringBuilder postData = new StringBuilder();
+	    for (Map.Entry<String, String> param : params.entrySet()) {
+	        if (postData.length() != 0) {
+	            postData.append('&');
+	        }
+	        postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+	        postData.append('=');
+	        postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+	    }
+	    list.add(connection);
+	    list.add(postData);
+	    
+	    return list;
 	}
+	
+	
+	void writePostData(String req,  Map<String, String> params) throws IOException {
+		 	List<Object> list = postData(req,  params);
+		    HttpURLConnection connection = (HttpURLConnection) list.get(0);
+		    StringBuilder postData = (StringBuilder) list.get(1);
+
+		    byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+		    connection.setDoOutput(true);
+
+		    try (DataOutputStream writer = new DataOutputStream(connection.getOutputStream())) {
+		        writer.write(postDataBytes);
+		        writer.flush();
+		        writer.close();
+
+		        StringBuilder content;
+
+		        try (BufferedReader in = new BufferedReader(
+		                new InputStreamReader(connection.getInputStream()))) {
+		        String line;
+		        content = new StringBuilder();
+		           while ((line = in.readLine()) != null) {
+		                content.append(line);
+		                content.append(System.lineSeparator());
+		            }
+		        }
+		        System.out.println(content.toString());
+		    } finally {
+		        connection.disconnect();
+		    }
+			
+	}
+	
+    void addNewNote(String note){
+	    Map<String, String> params = new HashMap<String, String>();
+	    params.put("NoteMessage", note);
+	    try {
+			writePostData("addNote",  params);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    }
+    
+    void deleteNote(Integer id){
+    	
+    	Note[] noteList = getNoteList();
+		id = noteList[id].getId();
+	    Map<String, String> params = new HashMap<String, String>();
+	    params.put("id", id.toString());
+	    try {
+			writePostData("deleteNote",  params);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    void updateNote(Integer id, String msg){
+    	
+    	Note[] noteList = getNoteList();
+		id = noteList[id].getId();
+	    Map<String, String> params = new HashMap<String, String>();
+	    params.put("id", id.toString());
+	    params.put("NoteMessage", msg);
+
+	    try {
+			writePostData("updateNote",  params);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+
     
   
     
@@ -224,32 +317,54 @@ public class ToDoUIController {
 
                 
 		ToDoUIController hce = new ToDoUIController();
-		Note[] noteList = hce.getNoteList();
-		String[] msgList = hce.getMsgList();
+//		hce.updateNote(1, "tal");
+		hce.removeAll();
+//		hce.getNoteList();
 		
-        List<Note> noteArrayList= new ArrayList<Note>(Arrays.asList(noteList));
-        
-        Integer id = noteList[1].getId();
-        System.out.println(id);
-//		for(Note note : noteList) {
-//			if(note.getId() == 7) {
-//				System.out.println(note.getMsg());
-//				break;
-//			}
-//		}
-		
+//	    Map<String, String> params = new HashMap<String, String>();
+////	    params.put("id", "1");
+//	    params.put("NoteMessage", "mynewNote");
+//	    hce.writePostData("addNote",  params);
 
-//		
-		hce.deleteItem(0);
-                
-//        hce.getList();
-		
-		
-		hce.addNewNote("new note");
 
 
 	}
 
 }
+
+
+
+//void addNewNote(String note){
+//String url = serverUrl+"addNote";
+//String newNote = "NoteMessage=" +note;
+//
+//try {
+//    String body = post(url, newNote);
+//    
+//    System.out.println(body);
+//} catch(IOException ioe) {
+//    ioe.printStackTrace();
+//}
+//}
+
+
+//void deleteItem(Integer id){
+//
+//Note[] noteList = getNoteList();
+//id = noteList[id].getId();
+//System.out.println("real index is = " + id);
+//String url = serverUrl+"deleteNote";
+//String ID = "id=" +id.toString();
+//
+//try {
+//    String body = post(url, ID);
+//    
+//    System.out.println(body);
+//} catch(IOException ioe) {
+//    ioe.printStackTrace();
+//}
+//}
+//
+//
 
 	
