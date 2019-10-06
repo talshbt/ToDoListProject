@@ -81,7 +81,7 @@ public class ToDoUI extends JFrame {
 	}
 
 	public void createTopPanel(JPanel topPannel) {
-		final JTextField nameField = new JTextField(14);
+		final JTextField nameField = new JTextField(8);
 
 		addButton = new JButton("Add");
 		deleteButton = new JButton("Delete");
@@ -193,7 +193,7 @@ public class ToDoUI extends JFrame {
 		list.setCellRenderer(getRenderer());
 		panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		panel.setPreferredSize(new Dimension(500, 400));
+		panel.setPreferredSize(new Dimension(500, 500));
 	}
 
 	void createToDoListPanel() {
